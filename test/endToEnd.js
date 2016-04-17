@@ -1,8 +1,8 @@
 var logger = require("winston");
-var Promise = require("bluebird");
 var should = require("should");
 var sensorAgentFactory = require("../sensorAgent");
 var webSinkRequestFactory = require("./webSinkRequest");
+var sensorFactory = require("./sensor");
 
 describe("Full end to end tests", function () {
 
@@ -40,4 +40,16 @@ describe("Full end to end tests", function () {
             .then(acquiredData => acquiredData.should.be.eql(sensorData));
     });
 
+    it("sensorAgent should accept connection from sensor and replay with CONFIRMATION frame", function () {
+        var receivedFrame;
+        
+        var sensor = sensorFactory
+            .create({serverPort: 6002, serverHost: "localhost"}, frame => receivedFrame = frame);
+
+        return sensorAgent
+            .startAsync()
+            .then(() => sensor.connectAsync())
+            .delay(50)
+            .then(() => receivedFrame.should.be.eql(new Buffer([0x01, 0x02, 0x03, 0x04])));
+    });
 });
