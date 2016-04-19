@@ -11,7 +11,9 @@ describe("Full end to end tests", function () {
     logger.level = "fatal";
 
     const config = {
-        webSinkPort: 6001
+        webSinkPort: 6001,
+        sensorServerPort: 6002,
+        sensorServerHost: "localhost"
     };
 
     const webSinkUrl = "http://localhost:" + config.webSinkPort + "/sensors";
