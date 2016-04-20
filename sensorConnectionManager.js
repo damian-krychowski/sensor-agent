@@ -9,7 +9,6 @@ module.exports.create = function (config) {
     }
 
     var server;
-    var connections = [];
 
     function startAsync() {
         return new Promise(function (resolve, reject) {
@@ -32,6 +31,8 @@ module.exports.create = function (config) {
             });
         }).then(() => logger.info("Sensor server is stopped"));
     }
+    
+    var connections = [];
 
     function createConnection(newConnection) {
         connections.push(newConnection);
