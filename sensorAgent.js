@@ -6,8 +6,7 @@ module.exports.create = function(config){
         startAsync: startAsync,
         stopAsync: stopAsync,
         
-        collectDataFromSensorsAsync:collectDataFromSensorsAsync,
-        exposeData: exposeData   
+        collectDataFromSensorsAsync:collectDataFromSensorsAsync
     }
     
     var webSink = webSinkFactory.create(config);

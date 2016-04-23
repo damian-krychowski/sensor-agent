@@ -30,19 +30,6 @@ describe("Full end to end tests", function () {
         return sensorAgent.stopAsync();
     });
 
-    it("sensorAgent should expose data acquired form sensors externally", function () {
-        var sensorData = {
-            sensorId: 1,
-            sensorValue: 1000
-        };
-
-        return sensorAgent
-            .startAsync()
-            .then(() => sensorAgent.exposeData(sensorData))
-            .then(() => webSinkRequest.executeAsync())
-            .then(acquiredData => acquiredData.should.be.eql(sensorData));
-    });
-
     it("sensorAgent should accept connection from sensor and reply with CONFIRMATION frame", function () {
         var sensor = sensorFactory.create()
             .withServerHost("localhost")
