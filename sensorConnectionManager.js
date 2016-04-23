@@ -4,7 +4,7 @@ var logger = require("winston");
 var frameFactory = require("./frame");
 var sensorConnectionFactory = require("./sensorConnection");
 
-module.exports.create = function (config) {
+module.exports.create = function (config, dateReceivedHandler) {
     var sensorConnectionManager = {
         startAsync: startAsync,
         stopAsync: stopAsync,
@@ -38,9 +38,9 @@ module.exports.create = function (config) {
     function collectDataFromSensorsAsync() {
         var sendStatusPromises = [];
 
-        connections.forEach(sensorConnection =>{
-           sendStatusPromises.push(
-               sensorConnection.sendStatusFrameAsync()); 
+        connections.forEach(sensorConnection => {
+            sendStatusPromises.push(
+                sensorConnection.sendStatusFrameAsync());
         });
 
         return Promise.all(sendStatusPromises);
@@ -51,7 +51,8 @@ module.exports.create = function (config) {
     function createConnection(socket) {
         var sensorConnection = sensorConnectionFactory.create(
             socket,
-            connectionClosed
+            connectionClosed,
+            dataReceived
         );
 
         connections.push(sensorConnection);
@@ -69,6 +70,17 @@ module.exports.create = function (config) {
     function connectionClosed(sensorConnection) {
         var index = connections.indexOf(sensorConnection);
         connections.splice(index, 1);
+    }
+
+    var sensorsData = [];
+
+    function dataReceived(sensorData) {
+        sensorsData = sensorsData
+            .filter(data => data.sensorId != sensorData.sensorId);
+
+        sensorsData.push(sensorData);
+
+        dateReceivedHandler(sensorsData);
     }
 
     return sensorConnectionManager;

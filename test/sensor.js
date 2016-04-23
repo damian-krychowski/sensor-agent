@@ -8,11 +8,8 @@ module.exports.create = function () {
         withServerHost: withServerHost,
         withServerPort: withServerPort,
         withFramesToRespondWith: withFramesToRespondWith,
-        withSensorId: withSensorId,
-        withSensorValue: withSensorValue,
         connectAsync: connectAsync,
         destroyConnection: destroyConnection,
-        dataFrame: dataFrame,
         isConnected: isConnected
     }
 
@@ -60,22 +57,6 @@ module.exports.create = function () {
     function withFramesToRespondWith(frames) {
         framesToRespondWith = frames.slice();
         return sensor;
-    }
-
-    function withSensorId(id) {
-        sensorId = id;
-        return sensor;
-    }
-
-    function withSensorValue(value) {
-        sensorValue = value;
-        return sensor;
-    }
-
-    function dataFrame() {
-        return frameFactory
-            .createDataFrame(sensorId, sensorValue)
-            .getBytes();
     }
 
     function isConnected() {

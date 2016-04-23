@@ -104,8 +104,8 @@ describe("Full end to end tests", function () {
             .then(() => sensor.firstReceivedFrame.should.be.eql(confirmationFrame()))
             .then(() => sensor.secondReceivedFrame.should.be.eql(statusFrame()))
     });
-    
-    function statusFrame(){
+
+    function statusFrame() {
         return frameFactory
             .createStatusFrame()
             .getBytes();
@@ -155,19 +155,15 @@ describe("Full end to end tests", function () {
         var firstSensor = sensorFactory.create()
             .withServerHost("localhost")
             .withServerPort(6002)
-            .withSensorId(1)
-            .withSensorValue(25)
             .withFramesToRespondWith([
-                firstSensor.dataFrame()
+                dataFrame({sensorId: 1, sensorValue: 25})
             ]);
 
         var secondSensor = sensorFactory.create()
             .withServerHost("localhost")
             .withServerPort(6002)
-            .withSensorId(2)
-            .withSensorValue(10)
             .withFramesToRespondWith([
-                secondSensor.dataFrame()
+                dataFrame({sensorId: 2, sensorValue: 10})
             ]);
 
         return sensorAgent
@@ -183,6 +179,12 @@ describe("Full end to end tests", function () {
                 { sensorId: 2, value: 10 }
             ]));
     });
+
+    function dataFrame(data) {
+        return frameFactory
+            .createDataFrame(data.sensorId, data.sensorValue)
+            .getBytes();
+    }
 
     function confirmationFrame() {
         return frameFactory

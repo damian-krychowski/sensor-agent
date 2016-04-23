@@ -1,7 +1,7 @@
 logger = require("winston");
 frameFactory = require("./frame");
 
-module.exports.create = function (socket, connectionClosedHandler) {
+module.exports.create = function (socket, connectionClosedHandler, dataReceivedHandler) {
     var sensorConnection = {
         close: close,
         sendConfirmationFrameAsync: sendConfirmationFrameAsync,
@@ -14,7 +14,7 @@ module.exports.create = function (socket, connectionClosedHandler) {
     socket.on("data", function (data) {
         try {
             logger.debug(JSON.stringify(data));
-            var receivedFrame = frameFactory.createFrame(data);
+            var receivedFrame = frameFactory.createFrameFromBytes(data);
             processFrame(receivedFrame);
         } catch (err) {
             logger.error(identity + ": " + err.toString());
@@ -23,8 +23,14 @@ module.exports.create = function (socket, connectionClosedHandler) {
     });
 
     function processFrame(frame) {
-        if(frame.isNack()){
+        if (frame.isNack()) {
             throw new Error("Sensor " + identity + " responded with NACK frame")
+        }
+        else if (frame.isData()) {
+            dataReceivedHandler({
+                sensorId: frame.getSensorId(),
+                value: frame.getSensorValue()
+            });
         }
     }
 

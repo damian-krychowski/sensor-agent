@@ -11,7 +11,7 @@ module.exports.create = function(config){
     }
     
     var webSink = webSinkFactory.create(config);
-    var sensorConnectionManager = sensorConnectionManagerFactory.create(config);
+    var sensorConnectionManager = sensorConnectionManagerFactory.create(config, exposeData);
     
     function startAsync(){
         return webSink.startAsync()
@@ -31,6 +31,6 @@ module.exports.create = function(config){
     function exposeData(newData){
         webSink.exposeData(newData);
     }
-    
+        
     return sensorAgent;
 }
