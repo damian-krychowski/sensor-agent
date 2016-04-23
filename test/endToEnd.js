@@ -45,16 +45,20 @@ describe("Full end to end tests", function () {
 
     it("sensorAgent should accept connection from sensor and reply with CONFIRMATION frame", function () {
         var receivedFrame;
-        
+
         var sensor = sensorFactory
-            .create({serverPort: 6002, serverHost: "localhost"}, frame => receivedFrame = frame);
+            .create({ serverPort: 6002, serverHost: "localhost" }, frame => receivedFrame = frame);
 
         return sensorAgent
             .startAsync()
             .then(() => sensor.connectAsync())
             .delay(50)
-            .then(() => receivedFrame.should.be.eql(
-                frameFactory.createConfirmationFrame().getBytes()
-            ));
+            .then(() => receivedFrame.should.be.eql(confirmationFrame()));
     });
+
+    function confirmationFrame() {
+        return frameFactory
+            .createConfirmationFrame()
+            .getBytes()
+    }
 });

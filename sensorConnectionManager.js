@@ -37,7 +37,7 @@ module.exports.create = function (config) {
 
     function createConnection(newConnection) {
         connections.push(newConnection);
-        newConnection.write(new Buffer([0x01, 0x02, 0x03, 0x04]));
+        newConnection.write(frameFactory.createConfirmationFrame().getBytes());
     }
     
     function closeConnections(){
