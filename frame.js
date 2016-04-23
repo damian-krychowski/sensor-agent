@@ -159,7 +159,7 @@ module.exports.createConfirmationFrame = function () {
     frameBytes.push(crc);
     frameBytes.push(ETX);
     
-    return createFrameFromBytes(frameBytes);
+    return createFrameFromBytes(new Buffer(frameBytes));
 }
 
 module.exports.createDataFrame = function (sensorId, sensorValue) {
@@ -169,7 +169,7 @@ module.exports.createDataFrame = function (sensorId, sensorValue) {
     frameBytes.push(crc);
     frameBytes.push(ETX);
     
-    return createFrameFromBytes(frameBytes);
+    return createFrameFromBytes(new Buffer(frameBytes));
 }
 
 module.exports.createStatusFrame = function () {
@@ -179,7 +179,7 @@ module.exports.createStatusFrame = function () {
     frameBytes.push(crc);
     frameBytes.push(ETX);
     
-    return createFrameFromBytes(frameBytes);
+    return createFrameFromBytes(new Buffer(frameBytes));
 }
 
 module.exports.createNackFrame = function (errorCode) {
@@ -189,7 +189,7 @@ module.exports.createNackFrame = function (errorCode) {
     frameBytes.push(crc);
     frameBytes.push(ETX);
     
-    return createFrameFromBytes(frameBytes);
+    return createFrameFromBytes(new Buffer(frameBytes));
 }
 
 function calculateCRC(frameBytes){

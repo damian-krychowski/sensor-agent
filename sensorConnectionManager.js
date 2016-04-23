@@ -1,6 +1,7 @@
 var Promise = require("bluebird");
 var net = require("net");
 var logger = require("winston");
+var frameFactory = require("./frame");
 
 module.exports.create = function (config) {
     var sensorConnectionManager = {

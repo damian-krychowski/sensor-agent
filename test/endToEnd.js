@@ -3,6 +3,7 @@ var should = require("should");
 var sensorAgentFactory = require("../sensorAgent");
 var webSinkRequestFactory = require("./webSinkRequest");
 var sensorFactory = require("./sensor");
+var frameFactory = require("../frame");
 
 describe("Full end to end tests", function () {
 
@@ -42,7 +43,7 @@ describe("Full end to end tests", function () {
             .then(acquiredData => acquiredData.should.be.eql(sensorData));
     });
 
-    it("sensorAgent should accept connection from sensor and replay with CONFIRMATION frame", function () {
+    it("sensorAgent should accept connection from sensor and reply with CONFIRMATION frame", function () {
         var receivedFrame;
         
         var sensor = sensorFactory
@@ -52,6 +53,8 @@ describe("Full end to end tests", function () {
             .startAsync()
             .then(() => sensor.connectAsync())
             .delay(50)
-            .then(() => receivedFrame.should.be.eql(new Buffer([0x01, 0x02, 0x03, 0x04])));
+            .then(() => receivedFrame.should.be.eql(
+                frameFactory.createConfirmationFrame().getBytes()
+            ));
     });
 });
