@@ -2,6 +2,7 @@ var Promise = require("bluebird");
 var net = require("net");
 var logger = require("winston");
 var frameFactory = require("./frame");
+var sensorConnectionFactory = require("./sensorConnection");
 
 module.exports.create = function (config) {
     var sensorConnectionManager = {
@@ -19,29 +20,43 @@ module.exports.create = function (config) {
                 if (err) { reject(err); }
                 else { resolve(); }
             });
-        }).then(() => logger.info("Sensor server started on " + config.sensorServerPort + " port."));
+        }).then(() => logger.info("Sensor server is started " + config.sensorServerHost + ":" + config.sensorServerPort));
     }
 
     function stopAsync() {
         return new Promise(function (resolve, reject) {
             closeConnections();
-            
+
             server.close(function (err) {
                 if (err) { reject(err); }
                 else { resolve(); }
             });
         }).then(() => logger.info("Sensor server is stopped"));
     }
-    
+
     var connections = [];
 
-    function createConnection(newConnection) {
-        connections.push(newConnection);
-        newConnection.write(frameFactory.createConfirmationFrame().getBytes());
+    function createConnection(socket) {
+        var sensorConnection = sensorConnectionFactory.create(
+            socket,
+            connectionClosed
+        );
+
+        connections.push(sensorConnection);
+
+        sensorConnection
+            .sendConfirmationFrameAsync()
+            .then(() => logger.info("Confirmation frame sent to sensor - " + sensorConnection.getIdentity()));
     }
-    
-    function closeConnections(){
-        connections.forEach(conn => conn.end());
+
+    function closeConnections() {
+        connections.forEach(
+            sensorConnection => sensorConnection.close());
+    }
+
+    function connectionClosed(sensorConnection) {
+        var index = connections.indexOf(sensorConnection);
+        connections.splice(index, 1);
     }
 
     return sensorConnectionManager;
