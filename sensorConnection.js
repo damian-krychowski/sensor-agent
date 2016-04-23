@@ -5,6 +5,7 @@ module.exports.create = function (socket, connectionClosedHandler) {
     var sensorConnection = {
         close: close,
         sendConfirmationFrameAsync: sendConfirmationFrameAsync,
+        sendStatusFrameAsync: sendStatusFrameAsync,
         getIdentity: getIdentity
     };
 
@@ -39,6 +40,18 @@ module.exports.create = function (socket, connectionClosedHandler) {
                 .createConfirmationFrame();
 
             socket.write(confirmationFrame.getBytes(), function (err) {
+                if (err) { reject(err); }
+                else { resolve(); }
+            });
+        });
+    }
+    
+    function sendStatusFrameAsync() {
+        return new Promise(function (resolve, reject) {
+            var statusFrame = frameFactory
+                .createStatusFrame();
+
+            socket.write(statusFrame.getBytes(), function (err) {
                 if (err) { reject(err); }
                 else { resolve(); }
             });

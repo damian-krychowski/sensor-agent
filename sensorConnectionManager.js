@@ -7,7 +7,8 @@ var sensorConnectionFactory = require("./sensorConnection");
 module.exports.create = function (config) {
     var sensorConnectionManager = {
         startAsync: startAsync,
-        stopAsync: stopAsync
+        stopAsync: stopAsync,
+        collectDataFromSensorsAsync: collectDataFromSensorsAsync
     }
 
     var server;
@@ -32,6 +33,17 @@ module.exports.create = function (config) {
                 else { resolve(); }
             });
         }).then(() => logger.info("Sensor server is stopped"));
+    }
+
+    function collectDataFromSensorsAsync() {
+        var sendStatusPromises = [];
+
+        connections.forEach(sensorConnection =>{
+           sendStatusPromises.push(
+               sensorConnection.sendStatusFrameAsync()); 
+        });
+
+        return Promise.all(sendStatusPromises);
     }
 
     var connections = [];
