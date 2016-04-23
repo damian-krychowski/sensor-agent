@@ -12,7 +12,8 @@ module.exports.create = function () {
         withSensorValue: withSensorValue,
         connectAsync: connectAsync,
         destroyConnection: destroyConnection,
-        dataFrame: dataFrame
+        dataFrame: dataFrame,
+        isConnected: isConnected
     }
 
     var serverHost, serverPort;
@@ -23,6 +24,28 @@ module.exports.create = function () {
     var framesToRespondWithIndex = 0;
     var sensorId;
     var sensorValue;
+    var wasClosed = false;
+
+    client.on("data", function (data) {
+        receivedDataCounter++;
+
+        if (receivedDataCounter === 1) {
+            sensor.firstReceivedFrame = data;
+        }
+
+        if (receivedDataCounter === 2) {
+            sensor.secondReceivedFrame = data;
+        }
+
+        if (framesToRespondWith && framesToRespondWith[framesToRespondWithIndex]) {
+            client.write(framesToRespondWith[framesToRespondWithIndex]);
+            framesToRespondWithIndex++;
+        }
+    });
+
+    client.on("close", function () {
+        wasClosed = true;
+    });
 
     function withServerHost(host) {
         serverHost = host;
@@ -48,29 +71,16 @@ module.exports.create = function () {
         sensorValue = value;
         return sensor;
     }
-    
-    function dataFrame(){
+
+    function dataFrame() {
         return frameFactory
             .createDataFrame(sensorId, sensorValue)
             .getBytes();
     }
 
-    client.on("data", function (data) {
-        receivedDataCounter++;
-
-        if (receivedDataCounter === 1) {
-            sensor.firstReceivedFrame = data;
-        }
-
-        if (receivedDataCounter === 2) {
-            sensor.secondReceivedFrame = data;
-        }
-
-        if (framesToRespondWith && framesToRespondWith[framesToRespondWithIndex]) {
-            client.write(framesToRespondWith[framesToRespondWithIndex]);
-            framesToRespondWithIndex++;
-        }
-    });
+    function isConnected() {
+        return !wasClosed;
+    }
 
     function connectAsync() {
         return new Promise(function (resolve, reject) {

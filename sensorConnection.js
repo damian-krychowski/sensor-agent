@@ -11,6 +11,23 @@ module.exports.create = function (socket, connectionClosedHandler) {
 
     var identity = socket.remoteAddress + ":" + socket.remotePort;
 
+    socket.on("data", function (data) {
+        try {
+            logger.debug(JSON.stringify(data));
+            var receivedFrame = frameFactory.createFrame(data);
+            processFrame(receivedFrame);
+        } catch (err) {
+            logger.error(identity + ": " + err.toString());
+            close();
+        }
+    });
+
+    function processFrame(frame) {
+        if(frame.isNack()){
+            throw new Error("Sensor " + identity + " responded with NACK frame")
+        }
+    }
+
     socket.on("end", function () {
         logger.info("Connection end: " + identity);
         socket.end();
@@ -45,7 +62,7 @@ module.exports.create = function (socket, connectionClosedHandler) {
             });
         });
     }
-    
+
     function sendStatusFrameAsync() {
         return new Promise(function (resolve, reject) {
             var statusFrame = frameFactory
