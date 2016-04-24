@@ -3,6 +3,7 @@ var net = require("net");
 var logger = require("winston");
 var frameFactory = require("./frame");
 var sensorConnectionFactory = require("./sensorConnection");
+var sensorDataCacheFactory = require("./sensorDataCache");
 
 module.exports.create = function (config, dateReceivedHandler) {
     var sensorConnectionManager = {
@@ -72,15 +73,11 @@ module.exports.create = function (config, dateReceivedHandler) {
         connections.splice(index, 1);
     }
 
-    var sensorsData = [];
+    var sensorsDataCache = sensorDataCacheFactory.create();
 
     function dataReceived(sensorData) {
-        sensorsData = sensorsData
-            .filter(data => data.sensorId != sensorData.sensorId);
-
-        sensorsData.push(sensorData);
-
-        dateReceivedHandler(sensorsData);
+        sensorsDataCache.update(sensorData);
+        dateReceivedHandler(sensorsDataCache.getData());
     }
 
     return sensorConnectionManager;
