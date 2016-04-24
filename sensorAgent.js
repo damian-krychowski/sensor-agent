@@ -1,7 +1,10 @@
 var webSinkFactory = require("./webSink");
 var sensorConnectionManagerFactory = require("./sensorConnectionManager");
+var heartbeatFactory = require("./heartbeat");
 
 module.exports.create = function(config){
+    const THIRTY_SECONDS = 30 * 1000;
+    
     var sensorAgent = {
         startAsync: startAsync,
         stopAsync: stopAsync,
@@ -11,6 +14,9 @@ module.exports.create = function(config){
     
     var webSink = webSinkFactory.create(config);
     var sensorConnectionManager = sensorConnectionManagerFactory.create(config, exposeData);
+    var heartbeat = heartbeatFactory.create();
+    
+    heartbeat.start(collectDataFromSensorsAsync, THIRTY_SECONDS);
     
     function startAsync(){
         return webSink.startAsync()
