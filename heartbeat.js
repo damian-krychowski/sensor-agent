@@ -1,9 +1,10 @@
+var Promise = require("bluebird");
 var logger = require("winston");
 
-module.exports.create = function() {
+module.exports.create = function () {
     var heartbeat = {
         start: start,
-        stop: stop
+        stopAsync: stopAsync
     }
 
     var shouldExecute = false;
@@ -14,19 +15,22 @@ module.exports.create = function() {
         interval(promise, delay);
     }
 
-    function stop() {
-        shouldExecute = false;
-        clearTimeout(task);
+    function stopAsync() {
+        return new Promise(function (resolve, reject) {
+            shouldExecute = false;
+            clearTimeout(task);
+            resolve();
+        });
     }
 
     function interval(promise, wait) {
-        var interv = function(w) {
-            return function() {
+        var interv = function (w) {
+            return function () {
                 if (shouldExecute) {
                     logger.debug("Heartbeat will be executed.");
                     promise.call(null)
                         .then(() => logger.debug("Heartbeat was executed."))
-                        .then(() =>  task = setTimeout(interv, w));
+                        .then(() => task = setTimeout(interv, w));
                 }
             };
         } (wait);

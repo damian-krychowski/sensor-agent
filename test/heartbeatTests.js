@@ -17,7 +17,7 @@ describe("Heartbeating", function () {
         heartbeat.start(promise, 100);
 
         return Promise.delay(550)
-            .then(() => heartbeat.stop())
+            .then(() => heartbeat.stopAsync())
             .then(() => counter.should.be.eql(5));
     });
 });
