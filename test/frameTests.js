@@ -1,4 +1,3 @@
-var logger = require("winston");
 var should = require("should");
 var frameFactory = require("../frame");
 
